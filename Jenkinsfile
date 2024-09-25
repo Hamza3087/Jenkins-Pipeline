@@ -18,20 +18,21 @@ pipeline {
         stage('Set Up Python') {
             steps {
                 script {
+                    def pythonPath = isUnix() ? '/usr/bin/python3' : 'C:\\Python39\\python.exe'
                     if (isUnix()) {
-                        sh '''
-                            python3 -m venv venv || python -m venv venv
+                        sh """
+                            ${pythonPath} -m venv venv
                             . venv/bin/activate
                             pip install --upgrade pip
                             pip install pytest
-                        '''
+                        """
                     } else {
-                        bat '''
-                            python -m venv venv
-                            venv\\Scripts\\activate
-                            pip install --upgrade pip
+                        bat """
+                            ${pythonPath} -m venv venv
+                            call venv\\Scripts\\activate.bat
+                            python -m pip install --upgrade pip
                             pip install pytest
-                        '''
+                        """
                     }
                 }
             }
@@ -46,7 +47,7 @@ pipeline {
                         '''
                     } else {
                         bat '''
-                            venv\\Scripts\\activate
+                            call venv\\Scripts\\activate.bat
                             python -m unittest discover
                         '''
                     }
@@ -61,7 +62,7 @@ pipeline {
                 if (isUnix()) {
                     sh 'deactivate || true'
                 } else {
-                    bat 'venv\\Scripts\\deactivate.bat || exit 0'
+                    bat 'call venv\\Scripts\\deactivate.bat || exit 0'
                 }
             }
         }
