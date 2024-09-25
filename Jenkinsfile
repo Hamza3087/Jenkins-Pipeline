@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the repository
-                git 'https://github.com/your-username/your-repo.git'
+                git 'https://github.com/Hamza3087/Jenkins-Pipeline.git'
             }
         }
         stage('Set Up Python') {
