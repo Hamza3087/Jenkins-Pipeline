@@ -1,29 +1,45 @@
-name: Python application
+pipeline {
+    agent any
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-
-      - name: Run tests
-        run: |
-          python -m unittest discover
+    stages {
+        stage('Clone Repository') {
+            steps {
+                // Clone the correct repository
+                git 'https://github.com/Hamza3087/Jenkins-Pipeline.git'
+            }
+        }
+        stage('Set Up Python') {
+            steps {
+                // Set up Python and install dependencies
+                sh '''
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install --upgrade pip
+                pip install pytest
+                '''
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                // Run the unit tests
+                sh '''
+                source venv/bin/activate
+                python -m unittest discover
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            // Cleanup
+            echo 'Cleaning up virtual environment'
+            sh 'deactivate'
+        }
+        success {
+            echo 'Build passed!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
