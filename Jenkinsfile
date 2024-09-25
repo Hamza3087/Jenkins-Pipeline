@@ -16,27 +16,27 @@ pipeline {
             }
         }
         stage('Set Up Python') {
-            steps {
-                script {
-                    def pythonPath = isUnix() ? '/usr/bin/python3' : 'C:\\Python39\\python.exe'
-                    if (isUnix()) {
-                        sh """
-                            ${pythonPath} -m venv venv
-                            . venv/bin/activate
-                            pip install --upgrade pip
-                            pip install pytest
-                        """
-                    } else {
-                        bat """
-                            ${pythonPath} -m venv venv
-                            call venv\\Scripts\\activate.bat
-                            python -m pip install --upgrade pip
-                            pip install pytest
-                        """
-                    }
-                }
+    steps {
+        script {
+            if (isUnix()) {
+                sh '''
+                    python3 -m venv venv || python -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install pytest
+                '''
+            } else {
+                bat '''
+                    C:\\Users\\dell\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m venv venv
+                    venv\\Scripts\\activate
+                    C:\\Users\\dell\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -m pip install --upgrade pip
+                    venv\\Scripts\\pip install pytest
+                '''
             }
         }
+    }
+}
+
         stage('Run Tests') {
             steps {
                 script {
