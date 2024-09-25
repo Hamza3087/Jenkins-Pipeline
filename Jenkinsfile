@@ -1,39 +1,65 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
-                // Clone the repository
                 git 'https://github.com/Hamza3087/Jenkins-Pipeline.git'
             }
         }
         stage('Set Up Python') {
             steps {
-                // Set up Python and install dependencies
-                sh '''
-                python3 -m venv venv
-                source venv/bin/activate
-                pip install --upgrade pip
-                pip install pytest
-                '''
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            python3 -m venv venv
+                            . venv/bin/activate
+                            pip install --upgrade pip
+                            pip install pytest
+                        '''
+                    } else {
+                        bat '''
+                            python -m venv venv
+                            venv\\Scripts\\activate
+                            pip install --upgrade pip
+                            pip install pytest
+                        '''
+                    }
+                }
             }
         }
         stage('Run Tests') {
             steps {
-                // Run the unit tests
-                sh '''
-                source venv/bin/activate
-                python -m unittest discover
-                '''
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            . venv/bin/activate
+                            python -m unittest discover
+                        '''
+                    } else {
+                        bat '''
+                            venv\\Scripts\\activate
+                            python -m unittest discover
+                        '''
+                    }
+                }
             }
         }
     }
     post {
         always {
-            // Cleanup
             echo 'Cleaning up virtual environment'
-            sh 'deactivate'
+            script {
+                if (isUnix()) {
+                    sh 'deactivate || true'
+                } else {
+                    bat 'venv\\Scripts\\deactivate.bat || exit 0'
+                }
+            }
         }
         success {
             echo 'Build passed!'
@@ -43,4 +69,3 @@ pipeline {
         }
     }
 }
-
