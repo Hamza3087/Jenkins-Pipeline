@@ -69,7 +69,7 @@ pipeline {
             echo 'Build passed!'
         }
         failure {
-            echo 'Build failed!'
+            echo 'Build failed please update code!'
         }
     }
 }
