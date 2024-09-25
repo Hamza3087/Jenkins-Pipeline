@@ -8,7 +8,11 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Hamza3087/Jenkins-Pipeline.git'
+                retry(3) {
+                    timeout(time: 2, unit: 'MINUTES') {
+                        git url: 'https://github.com/Hamza3087/Jenkins-Pipeline.git', branch: 'master'
+                    }
+                }
             }
         }
         stage('Set Up Python') {
@@ -16,7 +20,7 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh '''
-                            python3 -m venv venv
+                            python3 -m venv venv || python -m venv venv
                             . venv/bin/activate
                             pip install --upgrade pip
                             pip install pytest
